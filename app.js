@@ -1,15 +1,22 @@
+//import lib
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
-const { execSync } = require("child_process");
-const cmd = `curl -s http://checkip.amazonaws.com || printf "0.0.0.0"`;
-const pubIp = execSync(cmd).toString().trim();
+const cors = require('cors');
+//import router
+const apiRouter = require('./routes/api');
 
+// use lib
+require('dotenv').config()
+app.use(express.static("public"));
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-});
+//use router
+app.use('/api', apiRouter);
 
+// run
 app.listen(port, () => {
-    console.log(`My public IP address is: ${pubIp}`)
+    console.log(`App listening on port http://localhost:${port}/`)
 });
