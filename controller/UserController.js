@@ -1,6 +1,6 @@
-class User {
+class UserController {
     getUser(req, res) {
-        return res.send('user');
+        return res.json('user');
     }
 
     getDataCv(req, res) {
@@ -10,4 +10,4 @@ class User {
     }
 }
 
-module.exports = new User;
+module.exports = new UserController;
