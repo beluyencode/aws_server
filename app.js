@@ -1,23 +1,51 @@
-//import lib
-const express = require('express');
-const app = express();
-const port = process.env.PORT || 3000;
-const cors = require('cors');
+var express = require('express');
+var path = require('path');
+var app = express();
+var server = require('http').Server(app);
+var io = require('socket.io')(server, {
+    cors: {
+        origin: '*'
+    }
+});
+var count = 0;
 
-//import router
-const apiRouter = require('./routes/apiRouter');
+var port = process.env.port || 8000;
 
-// use lib
-require('dotenv').config()
-app.use(express.static("public"));
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.static(path.join(__dirname, "build")));
 
-//use router
-app.use('/api', apiRouter);
+app.get('/*', function (req, res) {
+    res.sendFile(path.resolve(__dirname, "build", "index.html"))
+})
 
-// run
-app.listen(port, () => {
-    console.log(`App listening on port http://localhost:${port}/`)
+io.on('connection', (socket) => {
+    console.log('new connection made');
+
+    socket.on('login', (data) => {
+        if (data == 1) {
+            if (count < 100) {
+                count += 1;
+                socket.emit('sendTicket', count);
+                io.sockets.emit('sendPercent', count);
+            } else {
+                socket.emit('sendTicket', count + 1);
+            }
+        } else {
+            io.sockets.emit('sendPercent', count);
+        }
+    });
+    socket.on('getPercent', (data) => {
+        socket.emit('sendPercent', count);
+    });
+
+    socket.on('event3', (data) => {
+        console.log(data.msg);
+        socket.emit('event4', {
+            msg: 'Loud and clear :)'
+        });
+    });
+
+});
+
+server.listen(port, () => {
+    console.log("Listening on port " + port);
 });
