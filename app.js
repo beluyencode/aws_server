@@ -9,7 +9,7 @@ var io = require('socket.io')(server, {
 });
 var count = 0;
 
-var port = process.env.port || 8000;
+var port = process.env.port || 3000;
 
 app.use(express.static(path.join(__dirname, "build")));
 
